@@ -1,0 +1,127 @@
+---
+type LocaleItem = {
+	code: string;
+	label: string;
+	href: string;
+	active: boolean;
+};
+
+interface Props {
+	label: string;
+	currentLabel: string;
+	items: LocaleItem[];
+}
+
+const { label, currentLabel, items } = Astro.props;
+---
+
+<details class="locale-menu relative" data-locale-menu>
+	<summary
+		class="flex h-9 min-w-[8.6rem] max-w-[10.25rem] list-none items-center justify-between gap-2 rounded-full border border-[#e7e1d6] bg-[#faf9f5]/84 px-2.5 text-[#4d4c48] shadow-[0_0_0_1px_rgba(209,207,197,0.4)] backdrop-blur transition-colors hover:bg-white max-sm:min-w-0 max-sm:max-w-[8rem]"
+	>
+		<span class="flex min-w-0 items-center gap-2.5">
+			<span
+				class="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-[#f4eee4] text-[#c96442] shadow-[0_0_0_1px_rgba(201,100,66,0.08)]"
+			>
+				<svg aria-hidden="true" class="size-3.5" fill="none" viewBox="0 0 24 24">
+					<path
+						d="M3 7.5 9 4l6 3.5L21 4v12.5L15 20l-6-3.5L3 20V7.5Z"
+						stroke="currentColor"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="1.8"
+					></path>
+					<path d="M9 4v12.5M15 7.5V20" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"></path>
+				</svg>
+			</span>
+			<span class="max-w-[5rem] truncate text-sm font-medium max-sm:max-w-[4.2rem]">{currentLabel}</span>
+		</span>
+		<svg aria-hidden="true" class="chevron size-4 shrink-0 opacity-60 transition-transform duration-200" fill="none" viewBox="0 0 24 24">
+			<path
+				d="m6 9 6 6 6-6"
+				stroke="currentColor"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="1.8"
+			></path>
+		</svg>
+	</summary>
+
+	<div class="absolute right-0 top-full z-50 mt-2 w-48 overflow-hidden rounded-xl border border-[#ece7db] bg-[#fcfbf7] p-1 shadow-md">
+		<p class="px-2 py-1 text-xs font-medium text-[#8a8479]">{label}</p>
+		<div class="mx-1 my-1 h-px bg-[#ece7db]"></div>
+
+		<div class="flex flex-col gap-0.5">
+			{
+				items.map((item) => (
+					<a
+						class:list={[
+							"flex items-center justify-between gap-3 rounded-md px-2 py-1.5 text-sm text-[#1f1d19] transition-colors hover:bg-[#f1ede4]",
+							item.active && "bg-[#f3efe7]",
+						]}
+						href={item.href}
+					>
+						<span class="truncate">{item.label}</span>
+						{
+							item.active && (
+								<svg aria-hidden="true" class="size-4 shrink-0 text-[#c96442]" fill="none" viewBox="0 0 24 24">
+									<path
+										d="m5 12 4.5 4.5L19 7"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="1.8"
+									></path>
+								</svg>
+							)
+						}
+					</a>
+				))
+			}
+		</div>
+	</div>
+</details>
+
+<script>
+	const menus = document.querySelectorAll("[data-locale-menu]");
+
+	const closeMenus = (except) => {
+		for (const menu of menus) {
+			if (menu !== except) menu.removeAttribute("open");
+		}
+	};
+
+	for (const menu of menus) {
+		menu.addEventListener("toggle", () => {
+			if (menu.hasAttribute("open")) closeMenus(menu);
+		});
+	}
+
+	document.addEventListener("click", (event) => {
+		for (const menu of menus) {
+			if (!menu.contains(event.target)) menu.removeAttribute("open");
+		}
+	});
+
+	document.addEventListener("keydown", (event) => {
+		if (event.key === "Escape") closeMenus();
+	});
+</script>
+
+<style>
+	.locale-menu summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.locale-menu summary {
+		cursor: pointer;
+	}
+
+	.locale-menu[open] .chevron {
+		transform: rotate(180deg);
+	}
+
+	.locale-menu[open] > summary {
+		background: white;
+	}
+</style>
